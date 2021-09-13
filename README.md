@@ -9,6 +9,17 @@ A "data:" scheme is used for inline image, like `<img src="data:image/png;base64
 
 The handler allows you to use inline image on your application.
 
+## Usage
+
+Just call `URLProtocolHandler.install()` method before start GUI that use data URL protocol.
+
+```java
+import tokyo.northside.protocol.URLProtocolHandler;
+
+URLProtocolHandler.install();
+```
+
+
 ## Copyright and License
 
 URL protocol handler for "data:" inline data

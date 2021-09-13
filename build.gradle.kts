@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
     implementation("commons-codec:commons-codec:1.15")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 

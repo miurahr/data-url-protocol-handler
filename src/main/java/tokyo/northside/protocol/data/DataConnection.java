@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  * The data protocol connection driver.
  * <p>
  * Data protocol Syntax
- *      data:[<mediatype>][;base64],<data>
+ *      <pre>data:[&lt;mediatypea&gt;base64],&lt;data&gt;</pre>
  * inspired from StackOverflow.
  *
  * @author Hiroshi Miura
@@ -60,9 +60,9 @@ public class DataConnection extends URLConnection {
     /**
      * Returns the value of the content-type header field.
      * <p>
-     * data protocol defined with optional content-type field.
-     * If omitted, defaults to text/plain;charset=US-ASCII.
-     * @return. the content type of the resource that the URL references.
+     *     data protocol defined with optional content-type field.
+     *     If omitted, defaults to text/plain;charset=US-ASCII.
+     * @return the content type of the resource that the URL references.
      */
     @Override
     public String getContentType() {

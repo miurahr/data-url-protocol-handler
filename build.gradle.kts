@@ -1,10 +1,14 @@
 plugins {
-    java
     checkstyle
     jacoco
+    signing
+    `java-library`
+    `java-library-distribution`
+    `maven-publish`
     id("com.github.spotbugs") version "4.7.3"
     id("com.diffplug.spotless") version "5.14.3"
     id("com.github.kt3k.coveralls") version "2.12.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     id("com.palantir.git-version") version "0.12.3"
 }
 
@@ -16,20 +20,9 @@ if (details.isCleanTag) {
     version = details.lastTag.substring(1) + "-" + details.commitDistance + "-" + details.gitHash + "-SNAPSHOT"
 }
 
-tasks.register("writeVersionFile") {
-    val folder = project.file("src/main/resources");
-    if (!folder.exists()) {
-        folder.mkdirs()
-    }
-    val props = project.file("src/main/resources/version.properties")
-    props.delete()
-    props.appendText("version=" + project.version + "\n")
-    props.appendText("commit=" + details.gitHashFull + "\n")
-    props.appendText("branch=" + details.branchName)
-}
-
-tasks.getByName("jar") {
-    dependsOn("writeVersionFile")
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 group = "tokyo.northside"
@@ -58,8 +51,8 @@ tasks.jacocoTestReport {
 
 tasks.jacocoTestReport {
     reports {
-        xml.isEnabled = true  // coveralls plugin depends on xml format report
-        html.isEnabled = true
+        xml.required.set(true)
+        html.required.set(true)
     }
 }
 
@@ -70,4 +63,65 @@ coveralls {
 tasks.withType<JavaCompile> {
     options.compilerArgs.add("-Xlint:deprecation")
     options.compilerArgs.add("-Xlint:unchecked")
+}
+
+tasks.withType<Sign>().configureEach {
+    onlyIf {
+        (project.hasProperty("signingKey") || project.hasProperty("signing.gnupg.keyName")) && versionDetails().isCleanTag as Boolean
+    }
+}
+
+signing {
+    if (project.hasProperty("signingKey")) {
+        val signingKey: String? by project
+        val signingPassword: String? by project
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    } else {
+        useGpgCmd()
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            pom {
+                name.set("URL protocol handler")
+                description.set("URL protocol handler for java")
+                url.set("https://github.com/miurahr/url-protocol-handler")
+                licenses {
+                    license {
+                        name.set("The GNU General Public License, Version 3")
+                        url.set("https://www.gnu.org/licenses/licenses/gpl-3.html")
+                        distribution.set("repo")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("miurahr")
+                        name.set("Hiroshi Miura")
+                        email.set("miurahr@linux.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/miurahr/url-protocol-handler.git")
+                    developerConnection.set("scm:git:git://github.com/miurahr/url-protocol-handler.git")
+                    url.set("https://github.com/miurahr/url-protocol-handler")
+                }
+            }
+        }
+    }
+}
+
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            stagingProfileId.set(properties["stagingProfileId"]?.toString())
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set(System.getenv("SONATYPE_USER"))
+            password.set(System.getenv("SONATYPE_PASS"))
+        }
+    }
 }

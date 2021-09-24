@@ -65,22 +65,6 @@ tasks.withType<JavaCompile> {
     options.compilerArgs.add("-Xlint:unchecked")
 }
 
-tasks.withType<Sign>().configureEach {
-    onlyIf {
-        (project.hasProperty("signingKey") || project.hasProperty("signing.gnupg.keyName")) && versionDetails().isCleanTag as Boolean
-    }
-}
-
-signing {
-    if (project.hasProperty("signingKey")) {
-        val signingKey: String? by project
-        val signingPassword: String? by project
-        useInMemoryPgpKeys(signingKey, signingPassword)
-    } else {
-        useGpgCmd()
-    }
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
@@ -111,6 +95,14 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    useGpgCmd()
+    sign(publishing.publications["mavenJava"])
+}
+tasks.withType<Sign> {
+    onlyIf { project.hasProperty("signing.gnupg.keyName") && versionDetails().isCleanTag }
 }
 
 nexusPublishing {

@@ -113,13 +113,9 @@ publishing {
     }
 }
 
-
 nexusPublishing {
     repositories {
         sonatype {
-            stagingProfileId.set(properties["stagingProfileId"]?.toString())
-            nexusUrl.set(uri("https://oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
             username.set(System.getenv("SONATYPE_USER"))
             password.set(System.getenv("SONATYPE_PASS"))
         }

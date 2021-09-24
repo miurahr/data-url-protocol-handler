@@ -98,11 +98,18 @@ publishing {
 }
 
 signing {
-    useGpgCmd()
+    if (project.hasProperty("signingKey")) {
+        val signingKey: String? by project
+        val signingPassword: String? by project
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    } else {
+        useGpgCmd()
+    }
     sign(publishing.publications["mavenJava"])
 }
 tasks.withType<Sign> {
-    onlyIf { project.hasProperty("signing.gnupg.keyName") && versionDetails().isCleanTag }
+    val hasKey = project.hasProperty("signingKey") || project.hasProperty("signing.gnupg.keyName")
+    onlyIf { hasKey && versionDetails().isCleanTag }
 }
 
 nexusPublishing {

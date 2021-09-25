@@ -9,6 +9,10 @@ A "data:" scheme is used for inline image, like `<img src="data:image/png;base64
 
 The handler allows you to use inline image on your application.
 
+## Specification
+
+You can find an Data URIs specification on [MDN Web Docs moz://a](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
+
 ## Usage
 
 Just call `URLProtocolHandler.install()` method before start GUI that use data URL protocol.

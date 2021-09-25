@@ -11,7 +11,7 @@ The handler allows you to use inline image on your application.
 
 ## Specification
 
-You can find an Data URIs specification on [MDN Web Docs moz://a](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
+You can find an Data URIs specification on [RFC2397](https://datatracker.ietf.org/doc/html/rfc2397) and detailed explanation on [MDN Web Docs moz://a](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
 
 ## Usage
 

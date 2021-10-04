@@ -23,6 +23,11 @@ import tokyo.northside.protocol.URLProtocolHandler;
 URLProtocolHandler.install();
 ```
 
+## What doing under the hood?
+
+I've inspired it from [stackoverflow answer by Joop Eggen](https://stackoverflow.com/questions/9388264/jeditorpane-with-inline-image/9388757#9388757).
+The handler basically does a samething with the article, but does it better and generalize, and registered in Maven central.
+
 
 ## Copyright and License
 

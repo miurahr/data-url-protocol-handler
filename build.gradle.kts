@@ -12,12 +12,12 @@ plugins {
     id("com.palantir.git-version") version "0.12.3"
 }
 
-val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
-val details = versionDetails()
-if (details.isCleanTag) {
-    version = details.lastTag.substring(1)
+// calculate version string from git tag, hash and commit distance
+fun getVersionDetails(): com.palantir.gradle.gitversion.VersionDetails = (extra["versionDetails"] as groovy.lang.Closure<*>)() as com.palantir.gradle.gitversion.VersionDetails
+if (getVersionDetails().isCleanTag) {
+    version = getVersionDetails().lastTag.substring(1)
 } else {
-    version = details.lastTag.substring(1) + "-" + details.commitDistance + "-" + details.gitHash + "-SNAPSHOT"
+    version = getVersionDetails().lastTag.substring(1) + "-" + getVersionDetails().commitDistance + "-" + getVersionDetails().gitHash + "-SNAPSHOT"
 }
 
 java {
@@ -47,17 +47,35 @@ jacoco {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test) // tests are required to run before generating the report
-}
-
-tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
         html.required.set(true)
     }
 }
 
+spotbugs {
+    excludeFilter.set(project.file("config/spotbugs/exclude.xml"))
+    tasks.spotbugsMain {
+        reports.create("html") {
+            required.set(true)
+        }
+    }
+    tasks.spotbugsTest {
+        reports.create("html") {
+            required.set(true)
+        }
+    }
+}
+
 coveralls {
     jacocoReportPath = "build/reports/jacoco/test/jacocoTestReport.xml"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    withSourcesJar()
+    withJavadocJar()
 }
 
 tasks.withType<JavaCompile> {
@@ -109,7 +127,7 @@ signing {
 }
 tasks.withType<Sign> {
     val hasKey = project.hasProperty("signingKey") || project.hasProperty("signing.gnupg.keyName")
-    onlyIf { hasKey && versionDetails().isCleanTag }
+    onlyIf { hasKey && getVersionDetails().isCleanTag }
 }
 
 nexusPublishing {
